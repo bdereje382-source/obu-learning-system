@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="om">
+<head>
+    <meta charset="UTF-8">
+    <title>OBU Online Classroom</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7f6; }
+        nav { background: #1e3c72; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        nav a, nav button { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; cursor: pointer; background: none; border: none; font-size: 15px; }
+        .logout-btn { background: #dc3545; padding: 7px 14px; border-radius: 4px; }
+        .container { max-width: 900px; margin: 30px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        input { width: 22%; padding: 10px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        .add-btn { padding: 10px 15px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .join-btn { background: #007bff; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; display: inline-block; }
+        .del-btn { background: #dc3545; color: white; padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #2a5298; color: white; }
+        .section { display: none; }
+        .active { display: block; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div><strong>OBU Online Learning</strong> | Baga Nagaan Dhufte: <span id="welcomeUser"></span></div>
+    <div>
+        <a onclick="showSection('coursesSec')">Koorsii & Online Class</a>
+        <a id="studentsNav" onclick="showSection('studentsSec')">Barattoota</a>
+        <button class="logout-btn" onclick="logout()">Ba'i (Logout)</button>
+    </div>
+</nav>
+
+<div class="container">
+    <div id="coursesSec" class="section active">
+        <h2>Koorsiiwwanii fi Barnoota Kallattii (Online Live Class)</h2>
+
+        <div id="instructorCourseForm">
+            <input type="text" id="courseCode" placeholder="Koodii (fkn: ECE301)">
+            <input type="text" id="courseTitle" placeholder="Maqaa Koorsii">
+            <input type="number" id="creditHour" placeholder="Credit">
+            <input type="text" id="liveLink" placeholder="Link Live Class (Meet/Zoom)">
+            <button class="add-btn" onclick="saveCourse()">Koorsii & Link Maxxansi</button>
+        </div>
+
+        <table>
+            <thead>
+            <tr><th>Koodii</th><th>Maqaa Koorsii</th><th>Credit</th><th>Online Class (Live)</th><th id="courseActionTh">Tarkaanfii</th></tr>
+            </thead>
+            <tbody id="courseTable"></tbody>
+        </table>
+    </div>
+
+    <div id="studentsSec" class="section">
+        <h2>Tarree Barattoota Galmaa'anii</h2>
+        <table>
+            <thead>
+            <tr><th>ID</th><th>Maqaa</th><th>Email</th><th>Dippaartimantii</th><th>Tarkaanfii</th></tr>
+            </thead>
+            <tbody id="studentTable"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const role = localStorage.getItem('userRole');
+    const userName = localStorage.getItem('userName');
+    if (!role) {
+        window.location.href = 'login.html';
+    }
+
+    document.getElementById('welcomeUser').innerText = userName;
+
+    if (role === 'STUDENT') {
+        document.getElementById('instructorCourseForm').style.display = 'none';
+        document.getElementById('studentsNav').style.display = 'none';
+        document.getElementById('courseActionTh').style.display = 'none';
+    }
+
+    function logout() {
+        localStorage.clear();
+        window.location.href = 'login.html';
+    }
+
+    function showSection(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function loadCourses() {
+        fetch('/courses').then(r => r.json()).then(data => {
+            let rows = '';
+            data.forEach(c => {
+                const linkBtn = c.liveLink ? `<a href="${c.liveLink}" target="_blank" class="join-btn">Dareetti Seeni (Join Live)</a>` : 'Link Hin Jiru';
+                const delBtn = role === 'INSTRUCTOR' ? `<td><button class="del-btn" onclick="deleteCourse(${c.id})">Haqi</button></td>` : '';
+                rows += `<tr><td>${c.courseCode}</td><td>${c.courseTitle}</td><td>${c.creditHour}</td><td>${linkBtn}</td>${delBtn}</tr>`;
+            });
+            document.getElementById('courseTable').innerHTML = rows;
+        });
+    }
+
+    function saveCourse() {
+        const c = {
+            courseCode: document.getElementById('courseCode').value,
+            courseTitle: document.getElementById('courseTitle').value,
+            creditHour: document.getElementById('creditHour').value,
+            liveLink: document.getElementById('liveLink').value
+        };
+        fetch('/courses', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(c) })
+            .then(() => { courseCode.value=''; courseTitle.value=''; creditHour.value=''; liveLink.value=''; loadCourses(); });
+    }
+
+    function deleteCourse(id) {
+        fetch('/courses/' + id, { method: 'DELETE' }).then(() => loadCourses());
+    }
+
+    function loadStudents() {
+        fetch('/students').then(r => r.json()).then(data => {
+            let rows = '';
+            data.forEach(s => {
+                rows += `<tr><td>${s.id}</td><td>${s.fullName}</td><td>${s.email}</td><td>${s.department}</td>
+                <td><button class="del-btn" onclick="deleteStudent(${s.id})">Haqi</button></td></tr>`;
+            });
+            document.getElementById('studentTable').innerHTML = rows;
+        });
+    }
+
+    function deleteStudent(id) {
+        fetch('/students/' + id, { method: 'DELETE' }).then(() => loadStudents());
+    }
+
+    loadCourses();
+    if (role === 'INSTRUCTOR') loadStudents();
+</script>
+</body>
+</html>

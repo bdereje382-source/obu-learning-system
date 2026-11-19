@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="om">
+<head>
+    <meta charset="UTF-8">
+    <title>OBU Learning System - Galmee Barattootaa</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f7f6; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; text-align: center; }
+        input { width: 95%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #218838; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #007bff; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>OBU Learning System</h2>
+    <input type="text" id="fullName" placeholder="Maqaa Guutuu Barataa" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="text" id="department" placeholder="Dippaartimantii (fkn: Computer Science)" required>
+    <button onclick="saveStudent()">Barataa Galmeessi</button>
+
+    <h3>Tarree Barattoota Galmaa'anii</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Maqaa Guutuu</th>
+            <th>Email</th>
+            <th>Dippaartimantii</th>
+        </tr>
+        </thead>
+        <tbody id="studentTable"></tbody>
+    </table>
+</div>
+
+<script>
+    function loadStudents() {
+        fetch('/students')
+            .then(res => res.json())
+            .then(data => {
+                let rows = '';
+                data.forEach(s => {
+                    rows += `<tr><td>${s.id}</td><td>${s.fullName}</td><td>${s.email}</td><td>${s.department}</td></tr>`;
+                });
+                document.getElementById('studentTable').innerHTML = rows;
+            });
+    }
+
+    function saveStudent() {
+        const student = {
+            fullName: document.getElementById('fullName').value,
+            email: document.getElementById('email').value,
+            department: document.getElementById('department').value
+        };
+
+        fetch('/students', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(student)
+        }).then(() => {
+            document.getElementById('fullName').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('department').value = '';
+            loadStudents();
+        });
+    }
+
+    loadStudents();
+</script>
+
+</body>
+</html>
