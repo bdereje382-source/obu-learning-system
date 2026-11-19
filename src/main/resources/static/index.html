@@ -1,77 +1,70 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="om">
 <head>
     <meta charset="UTF-8">
-    <title>OBU Learning System - Galmee Barattootaa</title>
+    <title>OBU Learning System - Seensa</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f7f6; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h2 { color: #2c3e50; text-align: center; }
-        input { width: 95%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; }
-        button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-        button:hover { background-color: #218838; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #007bff; color: white; }
+        body { font-family: Arial, sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 350px; }
+        h2 { text-align: center; color: #1e3c72; }
+        input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        button:hover { background: #218838; }
+        .toggle { text-align: center; margin-top: 15px; color: #007bff; cursor: pointer; font-size: 14px; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
+<div class="card">
+    <div id="loginBox">
+        <h2>Seensa Barataa (Login)</h2>
+        <input type="email" id="loginEmail" placeholder="Email Galchi" required>
+        <input type="password" id="loginPass" placeholder="Jecha Darbii (Password)" required>
+        <button onclick="loginUser()">Seeni (Login)</button>
+        <div class="toggle" onclick="toggleForm()">Akkawuntii hin qabduu? Asitti Galmaa'i</div>
+    </div>
 
-<div class="container">
-    <h2>OBU Learning System</h2>
-    <input type="text" id="fullName" placeholder="Maqaa Guutuu Barataa" required>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="text" id="department" placeholder="Dippaartimantii (fkn: Computer Science)" required>
-    <button onclick="saveStudent()">Barataa Galmeessi</button>
-
-    <h3>Tarree Barattoota Galmaa'anii</h3>
-    <table>
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Maqaa Guutuu</th>
-            <th>Email</th>
-            <th>Dippaartimantii</th>
-        </tr>
-        </thead>
-        <tbody id="studentTable"></tbody>
-    </table>
+    <div id="registerBox" class="hidden">
+        <h2>Galmee Barataa Haaraa</h2>
+        <input type="text" id="regName" placeholder="Maqaa Guutuu Barataa" required>
+        <input type="email" id="regEmail" placeholder="Email" required>
+        <input type="text" id="regDept" placeholder="Dippaartimantii (fkn. Computer Science)" required>
+        <input type="password" id="regPass" placeholder="Jecha Darbii (Password)" required>
+        <button onclick="registerUser()">Galmaa'ii Seeni</button>
+        <div class="toggle" onclick="toggleForm()">Duraan galmoofteettaa? Seeni</div>
+    </div>
 </div>
 
 <script>
-    function loadStudents() {
-        fetch('/students')
-            .then(res => res.json())
-            .then(data => {
-                let rows = '';
-                data.forEach(s => {
-                    rows += `<tr><td>${s.id}</td><td>${s.fullName}</td><td>${s.email}</td><td>${s.department}</td></tr>`;
-                });
-                document.getElementById('studentTable').innerHTML = rows;
+    function toggleForm() {
+        document.getElementById('loginBox').classList.toggle('hidden');
+        document.getElementById('registerBox').classList.toggle('hidden');
+    }
+
+    function loginUser() {
+        const email = document.getElementById('loginEmail').value;
+        if (!email) { alert("Maaloo Email galchi!"); return; }
+        localStorage.setItem("currentUser", email);
+        window.location.href = "/classroom.html";
+    }
+
+    async function registerUser() {
+        const name = document.getElementById('regName').value;
+        const email = document.getElementById('regEmail').value;
+        const department = document.getElementById('regDept').value;
+        if (!name || !email || !department) { alert("Maaloo odeeffannoo hunda guuti!"); return; }
+
+        try {
+            await fetch('/api/students', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, department })
             });
+        } catch (e) {}
+
+        localStorage.setItem("currentUser", name);
+        window.location.href = "/classroom.html";
     }
-
-    function saveStudent() {
-        const student = {
-            fullName: document.getElementById('fullName').value,
-            email: document.getElementById('email').value,
-            department: document.getElementById('department').value
-        };
-
-        fetch('/students', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(student)
-        }).then(() => {
-            document.getElementById('fullName').value = '';
-            document.getElementById('email').value = '';
-            document.getElementById('department').value = '';
-            loadStudents();
-        });
-    }
-
-    loadStudents();
 </script>
-
 </body>
 </html>
