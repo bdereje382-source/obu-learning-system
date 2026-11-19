@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: obu-learning-system
+    runtime: docker
+    plan: free
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: obu-db
+          property: connectionString
