@@ -2,36 +2,85 @@
 <html lang="om">
 <head>
     <meta charset="UTF-8">
-    <title>OBU Learning System - Seensa</title>
+    <title>OBU Learning System</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 0; }
+        .auth-wrapper { display: flex; justify-content: center; align-items: center; height: 100vh; }
         .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 350px; }
         h2 { text-align: center; color: #1e3c72; }
         input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         button { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; }
         button:hover { background: #218838; }
         .toggle { text-align: center; margin-top: 15px; color: #007bff; cursor: pointer; font-size: 14px; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
+        header { background: #1e3c72; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .container { max-width: 900px; margin: 30px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .course-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 6px; background: #fafafa; }
+        .logout-btn { background: #dc3545; width: auto; padding: 8px 15px; margin: 0; }
+        .join-btn { width: auto; padding: 8px 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #1e3c72; color: white; }
     </style>
 </head>
 <body>
-<div class="card">
-    <div id="loginBox">
-        <h2>Seensa Barataa (Login)</h2>
-        <input type="email" id="loginEmail" placeholder="Email Galchi" required>
-        <input type="password" id="loginPass" placeholder="Jecha Darbii (Password)" required>
-        <button onclick="loginUser()">Seeni (Login)</button>
-        <div class="toggle" onclick="toggleForm()">Akkawuntii hin qabduu? Asitti Galmaa'i</div>
-    </div>
 
-    <div id="registerBox" class="hidden">
-        <h2>Galmee Barataa Haaraa</h2>
-        <input type="text" id="regName" placeholder="Maqaa Guutuu Barataa" required>
-        <input type="email" id="regEmail" placeholder="Email" required>
-        <input type="text" id="regDept" placeholder="Dippaartimantii (fkn. Computer Science)" required>
-        <input type="password" id="regPass" placeholder="Jecha Darbii (Password)" required>
-        <button onclick="registerUser()">Galmaa'ii Seeni</button>
-        <div class="toggle" onclick="toggleForm()">Duraan galmoofteettaa? Seeni</div>
+<div id="authSection" class="auth-wrapper">
+    <div class="card">
+        <div id="loginBox">
+            <h2>Seensa Barataa (Login)</h2>
+            <input type="email" id="loginEmail" placeholder="Email Galchi" required>
+            <input type="password" id="loginPass" placeholder="Jecha Darbii (Password)" required>
+            <button onclick="loginUser()">Seeni (Login)</button>
+            <div class="toggle" onclick="toggleForm()">Akkawuntii hin qabduu? Asitti Galmaa'i</div>
+        </div>
+
+        <div id="registerBox" class="hidden">
+            <h2>Galmee Barataa Haaraa</h2>
+            <input type="text" id="regName" placeholder="Maqaa Guutuu Barataa" required>
+            <input type="email" id="regEmail" placeholder="Email" required>
+            <input type="text" id="regDept" placeholder="Dippaartimantii (fkn. Computer Science)" required>
+            <input type="password" id="regPass" placeholder="Jecha Darbii (Password)" required>
+            <button onclick="registerUser()">Galmaa'ii Seeni</button>
+            <div class="toggle" onclick="toggleForm()">Duraan galmoofteettaa? Seeni</div>
+        </div>
+    </div>
+</div>
+
+<div id="classroomSection" class="hidden">
+    <header>
+        <h1>OBU Online Classroom</h1>
+        <div>
+            <span id="userDisplay" style="margin-right: 15px;"></span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Koorsiiwwan Online (Courses)</h2>
+        <div class="course-card">
+            <h3>1. Introduction to Software Engineering</h3>
+            <p>Barsiisaa: Dr. Dereje | Sa'aatii: Wiixata & Roobii (2:00 - 4:00)</p>
+            <button class="join-btn" onclick="alert('Koorsii Software Engineering seenteetta!')">Koorsii Bani</button>
+        </div>
+        <div class="course-card">
+            <h3>2. Web Development & Cloud Computing</h3>
+            <p>Barsiisaa: Obbo Caalaa | Sa'aatii: Kibxata & Kamisa (4:00 - 6:00)</p>
+            <button class="join-btn" onclick="alert('Koorsii Web Development seenteetta!')">Koorsii Bani</button>
+        </div>
+
+        <h2>Tarree Barattoota Galmaa'anii</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Maqaa Guutuu</th>
+                    <th>Email</th>
+                    <th>Dippaartimantii</th>
+                </tr>
+            </thead>
+            <tbody id="studentTable"></tbody>
+        </table>
     </div>
 </div>
 
@@ -41,11 +90,18 @@
         document.getElementById('registerBox').classList.toggle('hidden');
     }
 
+    function showClassroom(userName) {
+        document.getElementById('authSection').classList.add('hidden');
+        document.getElementById('classroomSection').classList.remove('hidden');
+        document.getElementById('userDisplay').innerText = "Baga Nagaan Dhufte, " + userName;
+        loadStudents();
+    }
+
     function loginUser() {
         const email = document.getElementById('loginEmail').value;
         if (!email) { alert("Maaloo Email galchi!"); return; }
         localStorage.setItem("currentUser", email);
-        window.location.href = "/classroom.html";
+        showClassroom(email);
     }
 
     async function registerUser() {
@@ -63,8 +119,37 @@
         } catch (e) {}
 
         localStorage.setItem("currentUser", name);
-        window.location.href = "/classroom.html";
+        showClassroom(name);
     }
+
+    function logout() {
+        localStorage.removeItem("currentUser");
+        document.getElementById('classroomSection').classList.add('hidden');
+        document.getElementById('authSection').classList.remove('hidden');
+    }
+
+    async function loadStudents() {
+        try {
+            const res = await fetch('/api/students');
+            const students = await res.json();
+            const tbody = document.getElementById('studentTable');
+            tbody.innerHTML = students.map(s => `
+                <tr>
+                    <td>${s.id || '-'}</td>
+                    <td>${s.name}</td>
+                    <td>${s.email}</td>
+                    <td>${s.department}</td>
+                </tr>
+            `).join('');
+        } catch (e) {}
+    }
+
+    window.onload = function() {
+        const savedUser = localStorage.getItem("currentUser");
+        if (savedUser) {
+            showClassroom(savedUser);
+        }
+    };
 </script>
 </body>
 </html>
