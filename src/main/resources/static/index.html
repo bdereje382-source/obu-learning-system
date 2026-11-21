@@ -31,22 +31,22 @@
 
 <div id="authSection" class="auth-wrapper">
     <div class="card">
-        <div id="loginBox">
-            <h2>Student Login</h2>
-            <input type="email" id="loginEmail" placeholder="Enter Email" required>
-            <input type="password" id="loginPass" placeholder="Password" required>
-            <button onclick="loginUser()">Login</button>
-            <div class="toggle" onclick="toggleForm()">Don't have an account? Register here</div>
-        </div>
-
-        <div id="registerBox" class="hidden">
+        <div id="registerBox">
             <h2>New Student Registration</h2>
             <input type="text" id="regName" placeholder="Full Name" required>
             <input type="email" id="regEmail" placeholder="Email Address" required>
             <input type="text" id="regDept" placeholder="Department (e.g., Computer Science)" required>
             <input type="password" id="regPass" placeholder="Password" required>
             <button onclick="registerUser()">Register & Enter</button>
-            <div class="toggle" onclick="toggleForm()">Already registered? Login</div>
+            <div class="toggle" onclick="toggleForm()">Already registered? Login here</div>
+        </div>
+
+        <div id="loginBox" class="hidden">
+            <h2>Student Login</h2>
+            <input type="email" id="loginEmail" placeholder="Enter Email" required>
+            <input type="password" id="loginPass" placeholder="Password" required>
+            <button onclick="loginUser()">Login</button>
+            <div class="toggle" onclick="toggleForm()">Don't have an account? Register here</div>
         </div>
     </div>
 </div>
