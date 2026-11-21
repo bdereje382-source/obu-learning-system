@@ -17,7 +17,11 @@
         .container { max-width: 900px; margin: 30px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .course-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 6px; background: #fafafa; }
         .logout-btn { background: #dc3545; width: auto; padding: 8px 15px; margin: 0; }
-        .join-btn { width: auto; padding: 8px 15px; }
+        .join-btn { width: auto; padding: 8px 15px; margin-right: 10px; }
+        .live-btn { width: auto; padding: 8px 15px; background: #e63946; }
+        .live-btn:hover { background: #c1121f; }
+        .video-box { margin-top: 20px; padding: 15px; background: #eef2f7; border-radius: 8px; border: 1px solid #cbd5e1; }
+        iframe { width: 100%; height: 400px; border-radius: 6px; border: none; margin-top: 10px; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
         th { background: #1e3c72; color: white; }
@@ -57,16 +61,28 @@
     </header>
 
     <div class="container">
-        <h2>Koorsiiwwan Online (Courses)</h2>
+        <h2>Koorsiiwwan Online (Courses & Live Class)</h2>
+        
         <div class="course-card">
             <h3>1. Introduction to Software Engineering</h3>
             <p>Barsiisaa: Dr. Dereje | Sa'aatii: Wiixata & Roobii (2:00 - 4:00)</p>
-            <button class="join-btn" onclick="alert('Koorsii Software Engineering seenteetta!')">Koorsii Bani</button>
+            <button class="join-btn" onclick="openCourse('Introduction to Software Engineering', 'https://youtube.com')">Viidiyoo Barnootaa Bani</button>
+            <button class="live-btn" onclick="joinLive('OBU-Software-Engineering')">Live Class Seeni</button>
         </div>
+
         <div class="course-card">
             <h3>2. Web Development & Cloud Computing</h3>
             <p>Barsiisaa: Obbo Caalaa | Sa'aatii: Kibxata & Kamisa (4:00 - 6:00)</p>
-            <button class="join-btn" onclick="alert('Koorsii Web Development seenteetta!')">Koorsii Bani</button>
+            <button class="join-btn" onclick="openCourse('Web Development & Cloud Computing', 'https://youtube.com')">Viidiyoo Barnootaa Bani</button>
+            <button class="live-btn" onclick="joinLive('OBU-Web-Development')">Live Class Seeni</button>
+        </div>
+
+        <div id="mediaContainer" class="video-box hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 id="mediaTitle" style="margin: 0; color: #1e3c72;"></h3>
+                <button class="logout-btn" onclick="closeMedia()">Cufi (Close)</button>
+            </div>
+            <iframe id="mediaFrame" allow="camera; microphone; fullscreen; display-capture" allowfullscreen></iframe>
         </div>
 
         <h2>Tarree Barattoota Galmaa'anii</h2>
@@ -110,11 +126,19 @@
         const department = document.getElementById('regDept').value;
         if (!name || !email || !department) { alert("Maaloo odeeffannoo hunda guuti!"); return; }
 
+        const newStudent = { name, email, department };
+
+        // LocalStorage keessatti olkaa'i (akka tarree irratti mul'atuuf)
+        let localStudents = JSON.parse(localStorage.getItem("obu_students") || "[]");
+        localStudents.push(newStudent);
+        localStorage.setItem("obu_students", JSON.stringify(localStudents));
+
+        // Gara Backend API ergi
         try {
             await fetch('/api/students', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, department })
+                body: JSON.stringify(newStudent)
             });
         } catch (e) {}
 
@@ -124,24 +148,53 @@
 
     function logout() {
         localStorage.removeItem("currentUser");
+        closeMedia();
         document.getElementById('classroomSection').classList.add('hidden');
         document.getElementById('authSection').classList.remove('hidden');
     }
 
+    function openCourse(title, videoUrl) {
+        document.getElementById('mediaTitle').innerText = "Barnoota Viidiyoo: " + title;
+        document.getElementById('mediaFrame').src = videoUrl;
+        document.getElementById('mediaContainer').classList.remove('hidden');
+    }
+
+    function joinLive(roomName) {
+        document.getElementById('mediaTitle').innerText = "Live Class (Kallattiin): " + roomName;
+        document.getElementById('mediaFrame').src = "https://jit.si" + roomName;
+        document.getElementById('mediaContainer').classList.remove('hidden');
+    }
+
+    function closeMedia() {
+        document.getElementById('mediaFrame').src = "";
+        document.getElementById('mediaContainer').classList.add('hidden');
+    }
+
     async function loadStudents() {
+        let allStudents = JSON.parse(localStorage.getItem("obu_students") || "[]");
         try {
             const res = await fetch('/api/students');
-            const students = await res.json();
-            const tbody = document.getElementById('studentTable');
-            tbody.innerHTML = students.map(s => `
-                <tr>
-                    <td>${s.id || '-'}</td>
-                    <td>${s.name}</td>
-                    <td>${s.email}</td>
-                    <td>${s.department}</td>
-                </tr>
-            `).join('');
+            if (res.ok) {
+                const apiStudents = await res.json();
+                if (apiStudents.length > 0) {
+                    allStudents = apiStudents;
+                }
+            }
         } catch (e) {}
+
+        const tbody = document.getElementById('studentTable');
+        if (allStudents.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Ammatti barataan galmaa\'e hin jiru.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = allStudents.map((s, index) => `
+            <tr>
+                <td>${s.id || (index + 1)}</td>
+                <td>${s.name}</td>
+                <td>${s.email}</td>
+                <td>${s.department}</td>
+            </tr>
+        `).join('');
     }
 
     window.onload = function() {
