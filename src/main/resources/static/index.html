@@ -1,5 +1,5 @@
  <!DOCTYPE html>
-<html lang="om">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>OBU Learning System</title>
@@ -32,21 +32,21 @@
 <div id="authSection" class="auth-wrapper">
     <div class="card">
         <div id="loginBox">
-            <h2>Seensa Barataa (Login)</h2>
-            <input type="email" id="loginEmail" placeholder="Email Galchi" required>
-            <input type="password" id="loginPass" placeholder="Jecha Darbii (Password)" required>
-            <button onclick="loginUser()">Seeni (Login)</button>
-            <div class="toggle" onclick="toggleForm()">Akkawuntii hin qabduu? Asitti Galmaa'i</div>
+            <h2>Student Login</h2>
+            <input type="email" id="loginEmail" placeholder="Enter Email" required>
+            <input type="password" id="loginPass" placeholder="Password" required>
+            <button onclick="loginUser()">Login</button>
+            <div class="toggle" onclick="toggleForm()">Don't have an account? Register here</div>
         </div>
 
         <div id="registerBox" class="hidden">
-            <h2>Galmee Barataa Haaraa</h2>
-            <input type="text" id="regName" placeholder="Maqaa Guutuu Barataa" required>
-            <input type="email" id="regEmail" placeholder="Email" required>
-            <input type="text" id="regDept" placeholder="Dippaartimantii (fkn. Computer Science)" required>
-            <input type="password" id="regPass" placeholder="Jecha Darbii (Password)" required>
-            <button onclick="registerUser()">Galmaa'ii Seeni</button>
-            <div class="toggle" onclick="toggleForm()">Duraan galmoofteettaa? Seeni</div>
+            <h2>New Student Registration</h2>
+            <input type="text" id="regName" placeholder="Full Name" required>
+            <input type="email" id="regEmail" placeholder="Email Address" required>
+            <input type="text" id="regDept" placeholder="Department (e.g., Computer Science)" required>
+            <input type="password" id="regPass" placeholder="Password" required>
+            <button onclick="registerUser()">Register & Enter</button>
+            <div class="toggle" onclick="toggleForm()">Already registered? Login</div>
         </div>
     </div>
 </div>
@@ -61,38 +61,38 @@
     </header>
 
     <div class="container">
-        <h2>Koorsiiwwan Online (Courses & Live Class)</h2>
+        <h2>Online Courses & Live Classes</h2>
         
         <div class="course-card">
             <h3>1. Introduction to Software Engineering</h3>
-            <p>Barsiisaa: Dr. Dereje | Sa'aatii: Wiixata & Roobii (2:00 - 4:00)</p>
-            <button class="join-btn" onclick="openCourse('Introduction to Software Engineering', 'https://youtube.com')">Viidiyoo Barnootaa Bani</button>
-            <button class="live-btn" onclick="joinLive('OBU-Software-Engineering')">Live Class Seeni</button>
+            <p>Instructor: Dr. Dereje | Schedule: Monday & Wednesday (2:00 - 4:00)</p>
+            <button class="join-btn" onclick="openCourse('Introduction to Software Engineering', 'https://youtube.com')">Watch Video Lesson</button>
+            <button class="live-btn" onclick="joinLive('OBU-Software-Engineering')">Join Live Class</button>
         </div>
 
         <div class="course-card">
             <h3>2. Web Development & Cloud Computing</h3>
-            <p>Barsiisaa: Obbo Caalaa | Sa'aatii: Kibxata & Kamisa (4:00 - 6:00)</p>
-            <button class="join-btn" onclick="openCourse('Web Development & Cloud Computing', 'https://youtube.com')">Viidiyoo Barnootaa Bani</button>
-            <button class="live-btn" onclick="joinLive('OBU-Web-Development')">Live Class Seeni</button>
+            <p>Instructor: Mr. Chala | Schedule: Tuesday & Thursday (4:00 - 6:00)</p>
+            <button class="join-btn" onclick="openCourse('Web Development & Cloud Computing', 'https://youtube.com')">Watch Video Lesson</button>
+            <button class="live-btn" onclick="joinLive('OBU-Web-Development')">Join Live Class</button>
         </div>
 
         <div id="mediaContainer" class="video-box hidden">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3 id="mediaTitle" style="margin: 0; color: #1e3c72;"></h3>
-                <button class="logout-btn" onclick="closeMedia()">Cufi (Close)</button>
+                <button class="logout-btn" onclick="closeMedia()">Close</button>
             </div>
             <iframe id="mediaFrame" allow="camera; microphone; fullscreen; display-capture" allowfullscreen></iframe>
         </div>
 
-        <h2>Tarree Barattoota Galmaa'anii</h2>
+        <h2>Registered Students List</h2>
         <table>
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Maqaa Guutuu</th>
+                    <th>Full Name</th>
                     <th>Email</th>
-                    <th>Dippaartimantii</th>
+                    <th>Department</th>
                 </tr>
             </thead>
             <tbody id="studentTable"></tbody>
@@ -109,13 +109,13 @@
     function showClassroom(userName) {
         document.getElementById('authSection').classList.add('hidden');
         document.getElementById('classroomSection').classList.remove('hidden');
-        document.getElementById('userDisplay').innerText = "Baga Nagaan Dhufte, " + userName;
+        document.getElementById('userDisplay').innerText = "Welcome, " + userName;
         loadStudents();
     }
 
     function loginUser() {
         const email = document.getElementById('loginEmail').value;
-        if (!email) { alert("Maaloo Email galchi!"); return; }
+        if (!email) { alert("Please enter your email!"); return; }
         localStorage.setItem("currentUser", email);
         showClassroom(email);
     }
@@ -124,16 +124,14 @@
         const name = document.getElementById('regName').value;
         const email = document.getElementById('regEmail').value;
         const department = document.getElementById('regDept').value;
-        if (!name || !email || !department) { alert("Maaloo odeeffannoo hunda guuti!"); return; }
+        if (!name || !email || !department) { alert("Please fill in all fields!"); return; }
 
         const newStudent = { name, email, department };
 
-        // LocalStorage keessatti olkaa'i (akka tarree irratti mul'atuuf)
         let localStudents = JSON.parse(localStorage.getItem("obu_students") || "[]");
         localStudents.push(newStudent);
         localStorage.setItem("obu_students", JSON.stringify(localStudents));
 
-        // Gara Backend API ergi
         try {
             await fetch('/api/students', {
                 method: 'POST',
@@ -154,13 +152,13 @@
     }
 
     function openCourse(title, videoUrl) {
-        document.getElementById('mediaTitle').innerText = "Barnoota Viidiyoo: " + title;
+        document.getElementById('mediaTitle').innerText = "Video Lesson: " + title;
         document.getElementById('mediaFrame').src = videoUrl;
         document.getElementById('mediaContainer').classList.remove('hidden');
     }
 
     function joinLive(roomName) {
-        document.getElementById('mediaTitle').innerText = "Live Class (Kallattiin): " + roomName;
+        document.getElementById('mediaTitle').innerText = "Live Class: " + roomName;
         document.getElementById('mediaFrame').src = "https://jit.si" + roomName;
         document.getElementById('mediaContainer').classList.remove('hidden');
     }
@@ -184,7 +182,7 @@
 
         const tbody = document.getElementById('studentTable');
         if (allStudents.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Ammatti barataan galmaa\'e hin jiru.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No registered students yet.</td></tr>';
             return;
         }
         tbody.innerHTML = allStudents.map((s, index) => `
