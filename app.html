@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>OBU Online Teaching & Learning System</title>
+<style>
+body { font-family: Arial; background: #f0f4f8; margin: 0; }
+.nav { background: #003366; color: white; padding: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+.nav button { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+.box { max-width: 800px; margin: 20px auto; background: white; padding: 20px; border-radius: 8px; }
+input, select { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; }
+.btn { background: #28a745; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; cursor: pointer; border-radius: 5px; }
+table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+th { background: #003366; color: white; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <strong>OBU E-Learning</strong>
+  <button onclick="show('p1')">1. Login / Register</button>
+  <button onclick="show('p2')">2. Student Portal</button>
+  <button onclick="show('p3')">3. Instructor Portal</button>
+  <button onclick="show('p4')">4. Admin Panel</button>
+</div>
+
+<div class="box" id="p1">
+  <h2>User Registration & Login</h2>
+  <input id="n" placeholder="Full Name">
+  <input id="e" placeholder="Email">
+  <select id="r">
+    <option value="p2">Student</option>
+    <option value="p3">Instructor</option>
+    <option value="p4">Admin</option>
+  </select>
+  <button class="btn" onclick="reg()">Register & Enter</button>
+</div>
+
+<div class="box" id="p2" style="display:none">
+  <h2>Student Portal — Courses & Live Classes</h2>
+  <table id="ctab">
+    <tr><th>Code</th><th>Course</th><th>Live Class</th><th>Module</th></tr>
+    <tr><td>ECEg3101</td><td>OOP</td><td><a href="https://google.com" target="_blank">Join Live</a></td><td><a href="https://google.com" target="_blank">Open Module</a></td></tr>
+  </table>
+</div>
+
+<div class="box" id="p3" style="display:none">
+  <h2>Instructor Portal — Add Course & Live Link</h2>
+  <input id="cc" placeholder="Course Code (e.g. ECEg3101)">
+  <input id="cn" placeholder="Course Name">
+  <input id="cl" placeholder="Live Link (https://google.com)">
+  <input id="cm" placeholder="Module Link (https://google.com)">
+  <button class="btn" onclick="addC()">Publish Course</button>
+</div>
+
+<div class="box" id="p4" style="display:none">
+  <h2>Admin Panel — Registered Users</h2>
+  <table id="utab">
+    <tr><th>Name</th><th>Email</th><th>Role</th></tr>
+    <tr><td>Dereje Bekele</td><td>bdereje382@gmail.com</td><td>Student</td></tr>
+  </table>
+</div>
+
+<script>
+function show(id) {
+  document.getElementById('p1').style.display = 'none';
+  document.getElementById('p2').style.display = 'none';
+  document.getElementById('p3').style.display = 'none';
+  document.getElementById('p4').style.display = 'none';
+  document.getElementById(id).style.display = 'block';
+}
+function reg() {
+  var name = document.getElementById('n').value;
+  var email = document.getElementById('e').value;
+  var role = document.getElementById('r').value;
+  if(!name || !email) { alert('Enter Name and Email'); return; }
+  var row = document.getElementById('utab').insertRow();
+  row.innerHTML = '<td>'+name+'</td><td>'+email+'</td><td>'+role+'</td>';
+  show(role);
+}
+function addC() {
+  var c = document.getElementById('cc').value;
+  var n = document.getElementById('cn').value;
+  var l = document.getElementById('cl').value || 'https://google.com';
+  var m = document.getElementById('cm').value || 'https://google.com';
+  if(!c || !n) { alert('Enter Course Code and Name'); return; }
+  var row = document.getElementById('ctab').insertRow();
+  row.innerHTML = '<td>'+c+'</td><td>'+n+'</td><td><a href="'+l+'" target="_blank">Join Live</a></td><td><a href="'+m+'" target="_blank">Open Module</a></td>';
+  alert('Course Published!');
+  show('p2');
+}
+</script>
+</body>
+</html>
