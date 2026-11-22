@@ -43,35 +43,33 @@
 </head>
 <body>
 
-<!-- 1. LOGIN & REGISTRATION -->
 <div id="authSection" class="auth-wrapper">
     <div class="card">
         <div id="registerBox">
             <h2>User Registration</h2>
-            <input type="text" id="regName" placeholder="Full Name" required>
-            <input type="email" id="regEmail" placeholder="Email Address" required>
-            <input type="text" id="regDept" placeholder="Department (e.g., Computer Science)" required>
+            <input type="text" id="regName" placeholder="Full Name">
+            <input type="email" id="regEmail" placeholder="Email Address">
+            <input type="text" id="regDept" placeholder="Department (e.g., Computer Science)">
             <select id="regRole">
                 <option value="Student" selected>Student (Default)</option>
                 <option value="Instructor">Instructor</option>
                 <option value="Admin">Admin</option>
             </select>
-            <input type="password" id="regPass" placeholder="Create Password" required>
-            <button type="button" onclick="registerUser()">Register & Enter System</button>
-            <div class="toggle" onclick="toggleForm()">Already have an account? Login here</div>
+            <input type="password" id="regPass" placeholder="Create Password">
+            <button type="button" id="btnRegister">Register & Enter System</button>
+            <div class="toggle" id="linkToLogin">Already have an account? Login here</div>
         </div>
 
         <div id="loginBox" class="hidden">
             <h2>User Login</h2>
-            <input type="email" id="loginEmail" placeholder="Enter Registered Email" required>
-            <input type="password" id="loginPass" placeholder="Password" required>
-            <button type="button" onclick="loginUser()">Login</button>
-            <div class="toggle" onclick="toggleForm()">New user? Register here</div>
+            <input type="email" id="loginEmail" placeholder="Enter Registered Email">
+            <input type="password" id="loginPass" placeholder="Password">
+            <button type="button" id="btnLogin">Login</button>
+            <div class="toggle" id="linkToRegister">New user? Register here</div>
         </div>
     </div>
 </div>
 
-<!-- 2. MAIN PORTAL -->
 <div id="mainSection" class="hidden">
     <header>
         <div>
@@ -80,13 +78,13 @@
         </div>
         <div>
             <span id="userDisplay" style="margin-right: 15px; font-size: 14px;"></span>
-            <button type="button" class="logout-btn" onclick="logout()">Logout</button>
+            <button type="button" class="logout-btn" id="btnLogout">Logout</button>
         </div>
     </header>
 
     <div class="container">
 
-        <!-- INSTRUCTOR ONLY PANEL: PUBLISH COURSE & MODULE -->
+        <!-- INSTRUCTOR ONLY PANEL -->
         <div id="instructorSection" class="panel-box hidden">
             <h3 style="margin-top:0; color:#1e3c72;">👨‍🏫 Instructor Dashboard — Add Course, Upload Module & Start Live</h3>
             <div class="form-grid">
@@ -98,20 +96,20 @@
                 <label style="font-size:13px; font-weight:bold; color:#1e3c72;">📄 Upload Course Module (PDF, DOCX, PPT, TXT — Max 3MB):</label>
                 <input type="file" id="courseFile" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.png,.jpg,.jpeg" style="margin-top:5px;">
             </div>
-            <button type="button" class="btn-sm" style="margin-top:12px;" onclick="publishCourse()">+ Publish Course & Create Live Room</button>
+            <button type="button" class="btn-sm" style="margin-top:12px;" id="btnPublish">+ Publish Course & Create Live Room</button>
         </div>
 
         <!-- LIVE CLASS & VIDEO VIEWER -->
         <div id="mediaContainer" class="video-box hidden">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3 id="mediaTitle" style="margin: 0; color: #1e3c72;"></h3>
-                <button type="button" class="logout-btn" onclick="closeMedia()">Close</button>
+                <button type="button" class="logout-btn" id="btnCloseMedia">Close</button>
             </div>
             <p style="font-size: 13px; color: #555; margin: 5px 0;">* On mobile, click <b>"Continue in browser"</b> and allow Camera & Microphone.</p>
             <iframe id="mediaFrame" allow="camera; microphone; fullscreen; display-capture" allowfullscreen></iframe>
         </div>
 
-        <!-- COURSES TABLE (VISIBLE TO ALL, LIVE START ONLY FOR INSTRUCTOR) -->
+        <!-- COURSES TABLE -->
         <div id="coursesSection">
             <h2 style="text-align:left; margin-top:0;">📚 Courses, Modules & Live Classes</h2>
             <table>
@@ -128,7 +126,7 @@
             </table>
         </div>
 
-        <!-- ADMIN ONLY PANEL: MANAGE & REMOVE STUDENTS -->
+        <!-- ADMIN ONLY PANEL -->
         <div id="adminSection" class="panel-box hidden" style="margin-top: 30px;">
             <h2 style="text-align:left; margin-top:0;">🛡️ Admin Panel — Registered Users Management</h2>
             <p style="font-size:13px; color:#555;">Only System Admin can view and remove registered students or users.</p>
@@ -151,6 +149,7 @@
 </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", function() {
     const defaultCourses = [
         {
             code: "SE301",
@@ -172,19 +171,29 @@
         }
     ];
 
-    function toggleForm() {
-        document.getElementById('loginBox').classList.toggle('hidden');
-        document.getElementById('registerBox').classList.toggle('hidden');
+    function getUsers() {
+        try {
+            return JSON.parse(localStorage.getItem("obu_users_v3")) || [];
+        } catch (e) {
+            return [];
+        }
     }
 
-    function registerUser() {
-        const name = document.getElementById('regName').value.trim();
-        const email = document.getElementById('regEmail').value.trim().toLowerCase();
-        const department = document.getElementById('regDept').value.trim();
-        const role = document.getElementById('regRole').value; // Student, Instructor, or Admin
+    function saveUsers(list) {
+        localStorage.setItem("obu_users_v3", JSON.stringify(list));
+    }
 
-        if (!name || !email || !department) {
-            alert("Please fill in Name, Email, and Department!");
-            return;
-        }
+    function getCourses() {
+        try {
+            const saved = JSON.parse(localStorage.getItem("obu_courses_v3"));
+            if (saved && Array.isArray(saved)) return saved;
+        } catch (e) {}
+        localStorage.setItem("obu_courses_v3", JSON.stringify(defaultCourses));
+        return defaultCourses;
+    }
+
+    document.getElementById("linkToLogin").onclick = function() {
+        document.getElementById("registerBox").classList.add("hidden");
+        document.getElementById("loginBox").classList.remove("hidden");
+    };
 
