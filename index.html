@@ -1,219 +1,189 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OBU Online Teaching & Learning System</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #f0f4f8; color: #333; }
-        .navbar { background: #003366; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .navbar .brand { font-size: 20px; font-weight: bold; }
-        .navbar button { background: #00509e; color: white; border: none; padding: 9px 16px; margin: 3px; border-radius: 5px; cursor: pointer; font-weight: 600; transition: 0.3s; }
-        .navbar button:hover, .navbar button.active { background: #28a745; }
-        .container { max-width: 900px; margin: 30px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .section { display: none; }
-        .section.active { display: block; }
-        h2 { color: #003366; border-bottom: 2px solid #003366; padding-bottom: 10px; margin-top: 0; }
-        label { font-weight: bold; display: block; margin-top: 10px; color: #444; }
-        input, select { width: 100%; padding: 10px; margin: 6px 0 12px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
-        .btn-submit { background: #003366; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-submit:hover { background: #002244; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-        th { background: #003366; color: white; }
-        tr:nth-child(even) { background: #f9fbfd; }
-        .btn-live { background: #28a745; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: bold; display: inline-block; }
-        .btn-live:hover { background: #218838; }
-        .btn-module { background: #007bff; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: bold; display: inline-block; }
-        .btn-module:hover { background: #0056b3; }
-        .btn-delete { background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; }
-        .alert-success { background: #d4edda; color: #155724; padding: 12px; border-radius: 5px; margin-bottom: 15px; display: none; font-weight: bold; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
+        .auth-wrapper { display: flex; justify-content: center; align-items: center; height: 100vh; background: linear-gradient(135deg, #1e3c72, #2a5298); }
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 380px; }
+        h2 { text-align: center; color: #1e3c72; margin-bottom: 15px; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
+        button { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 15px; margin-top: 10px; font-weight: bold; }
+        button:hover { background: #218838; }
+        .toggle { text-align: center; margin-top: 15px; color: #007bff; cursor: pointer; font-size: 14px; }
+        .hidden { display: none !important; }
+
+        header { background: #1e3c72; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { margin: 0; font-size: 20px; }
+        .role-badge { background: #ffc107; color: #000; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-left: 10px; }
+        .logout-btn { background: #dc3545; width: auto; padding: 8px 15px; margin: 0; font-size: 14px; }
+
+        .container { max-width: 1000px; margin: 25px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .panel-box { background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+
+        .btn-sm { width: auto; padding: 7px 12px; font-size: 13px; margin-right: 5px; display: inline-block; text-decoration: none; border-radius: 5px; color: white; background: #28a745; font-weight: bold; cursor: pointer; border: none; }
+        .btn-sm:hover { background: #218838; }
+        .btn-live { background: #e63946; }
+        .btn-live:hover { background: #c1121f; }
+        .btn-file { background: #007bff; }
+        .btn-file:hover { background: #0056b3; }
+        .btn-del { background: #dc3545; padding: 6px 12px; font-size: 12px; width: auto; margin: 0; }
+
+        .video-box { margin-top: 20px; padding: 15px; background: #eef2f7; border-radius: 8px; border: 2px solid #1e3c72; }
+        iframe { width: 100%; height: 420px; border-radius: 6px; border: none; margin-top: 10px; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #1e3c72; color: white; }
+        tr:nth-child(even) { background: #f9f9f9; }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <div class="brand">🎓 OBU Online Teaching & Learning System</div>
-    <div>
-        <button type="button" onclick="showTab('login')" id="btn-login" class="active">1. Login / Register</button>
-        <button type="button" onclick="showTab('student')" id="btn-student">2. Student Portal</button>
-        <button type="button" onclick="showTab('instructor')" id="btn-instructor">3. Instructor Portal</button>
-        <button type="button" onclick="showTab('admin')" id="btn-admin">4. Admin Panel</button>
+<div id="authSection" class="auth-wrapper">
+    <div class="card">
+        <div id="registerBox">
+            <h2>User Registration</h2>
+            <input type="text" id="regName" placeholder="Full Name" required>
+            <input type="email" id="regEmail" placeholder="Email Address" required>
+            <input type="text" id="regDept" placeholder="Department (e.g., Computer Science)" required>
+            <select id="regRole">
+                <option value="Student" selected>Student (Default)</option>
+                <option value="Instructor">Instructor</option>
+                <option value="Admin">Admin</option>
+            </select>
+            <input type="password" id="regPass" placeholder="Create Password" required>
+            <button type="button" onclick="registerUser()">Register & Enter System</button>
+            <div class="toggle" onclick="toggleForm()">Already have an account? Login here</div>
+        </div>
+
+        <div id="loginBox" class="hidden">
+            <h2>User Login</h2>
+            <input type="email" id="loginEmail" placeholder="Enter Registered Email" required>
+            <input type="password" id="loginPass" placeholder="Password" required>
+            <button type="button" onclick="loginUser()">Login</button>
+            <div class="toggle" onclick="toggleForm()">New user? Register here</div>
+        </div>
     </div>
 </div>
 
-<div class="container">
-    <div id="statusMsg" class="alert-success"></div>
+<div id="mainSection" class="hidden">
+    <header>
+        <div>
+            <h1 style="display:inline;">🎓 OBU Online Teaching & Learning System</h1>
+            <span id="roleBadge" class="role-badge"></span>
+        </div>
+        <div>
+            <span id="userDisplay" style="margin-right: 15px; font-size: 14px;"></span>
+            <button type="button" class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </header>
 
-    <!-- 1. LOGIN & REGISTRATION -->
-    <div id="login" class="section active">
-        <h2>User Registration & Login</h2>
-        <label>Full Name</label>
-        <input type="text" id="userName" placeholder="e.g., Feyisa Abera">
+    <div class="container">
 
-        <label>Email Address</label>
-        <input type="email" id="userEmail" placeholder="e.g., fayisaabera404@gmail.com">
+        <div id="instructorSection" class="panel-box hidden">
+            <h3 style="margin-top:0; color:#1e3c72;">👨‍🏫 Instructor Dashboard — Add Course, Upload Module & Start Live</h3>
+            <div class="form-grid">
+                <input type="text" id="courseCode" placeholder="Course Code (e.g., CS301)">
+                <input type="text" id="courseTitle" placeholder="Course Title (e.g., Software Engineering)">
+                <input type="text" id="courseVideo" placeholder="YouTube Video Link (Optional)">
+            </div>
+            <div style="margin-top:10px; background:white; padding:10px; border-radius:5px; border:1px dashed #1e3c72;">
+                <label style="font-size:13px; font-weight:bold; color:#1e3c72;">📄 Upload Course Module (PDF, DOCX, PPT, TXT — Max 3MB):</label>
+                <input type="file" id="courseFile" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.png,.jpg,.jpeg" style="margin-top:5px;">
+            </div>
+            <button type="button" class="btn-sm" style="margin-top:12px;" onclick="publishCourse()">+ Publish Course & Create Live Room</button>
+        </div>
 
-        <label>Select Role</label>
-        <select id="userRole">
-            <option value="student">Student</option>
-            <option value="instructor">Instructor</option>
-            <option value="admin">Administrator (Admin)</option>
-        </select>
+        <div id="mediaContainer" class="video-box hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 id="mediaTitle" style="margin: 0; color: #1e3c72;"></h3>
+                <button type="button" class="logout-btn" onclick="closeMedia()">Close</button>
+            </div>
+            <p style="font-size: 13px; color: #555; margin: 5px 0;">* On mobile, click <b>"Continue in browser"</b> and allow Camera & Microphone.</p>
+            <iframe id="mediaFrame" allow="camera; microphone; fullscreen; display-capture" allowfullscreen></iframe>
+        </div>
 
-        <button type="button" class="btn-submit" onclick="loginUser()">Register & Enter System</button>
-    </div>
+        <div id="coursesSection">
+            <h2 style="text-align:left; margin-top:0;">📚 Courses, Modules & Live Classes</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Course Title</th>
+                        <th>Instructor</th>
+                        <th>Live Class</th>
+                        <th>Module & Video</th>
+                    </tr>
+                </thead>
+                <tbody id="coursesTableBody"></tbody>
+            </table>
+        </div>
 
-    <!-- 2. STUDENT DASHBOARD -->
-    <div id="student" class="section">
-        <h2>Student Dashboard — Available Courses & Live Classes</h2>
-        <p>Click <strong>Join Live Class</strong> to attend online sessions or <strong>Download Module</strong> to access study materials.</p>
-        <table>
-            <thead>
-            <tr>
-                <th>Course Code</th>
-                <th>Course Title</th>
-                <th>Instructor</th>
-                <th>Live Session</th>
-                <th>Course Module</th>
-            </tr>
-            </thead>
-            <tbody id="studentCourseList"></tbody>
-        </table>
-    </div>
+        <div id="adminSection" class="panel-box hidden" style="margin-top: 30px;">
+            <h2 style="text-align:left; margin-top:0;">🛡️ Admin Panel — Registered Users Management</h2>
+            <p style="font-size:13px; color:#555;">Only System Admin can view and remove registered students or users.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody"></tbody>
+            </table>
+        </div>
 
-    <!-- 3. INSTRUCTOR DASHBOARD -->
-    <div id="instructor" class="section">
-        <h2>Instructor Dashboard — Upload Course, Live Link & Module</h2>
-        <label>Course Code</label>
-        <input type="text" id="courseCode" placeholder="e.g., ECEg3101">
-
-        <label>Course Title</label>
-        <input type="text" id="courseName" placeholder="e.g., Signals and Systems Analysis">
-
-        <label>Instructor Name</label>
-        <input type="text" id="instructorName" placeholder="e.g., Mr. Abebe Kebede">
-
-        <label>Live Class Link (Google Meet / Zoom URL)</label>
-        <input type="url" id="liveLink" placeholder="e.g., https://google.com">
-
-        <label>Upload Module File (PDF, PPT, DOCX) OR Paste Module Link below</label>
-        <input type="file" id="moduleFile" accept=".pdf,.doc,.docx,.ppt,.pptx">
-        <input type="url" id="moduleLink" placeholder="Or paste Google Drive / PDF link here (optional)">
-
-        <button type="button" class="btn-submit" onclick="addCourse()">Publish Course & Materials</button>
-    </div>
-
-    <!-- 4. ADMIN DASHBOARD -->
-    <div id="admin" class="section">
-        <h2>Admin Panel — System Management</h2>
-        <h3>Registered Users</h3>
-        <table>
-            <thead>
-            <tr>
-                <th>Full Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody id="adminUserList"></tbody>
-        </table>
-
-        <h3 style="margin-top: 30px;">Manage Published Courses</h3>
-        <table>
-            <thead>
-            <tr>
-                <th>Course Code</th>
-                <th>Course Title</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody id="adminCourseList"></tbody>
-        </table>
     </div>
 </div>
 
 <script>
-    var courses = JSON.parse(localStorage.getItem("obu_courses_v3")) || [
+    const defaultCourses = [
         {
-            code: "ECEg3101",
-            name: "Object Oriented Programming",
-            instructor: "Dr. Tadesse",
-            live: "https://google.com",
-            moduleUrl: "https://w3.org",
-            moduleName: "OOP_Lecture_Notes.pdf"
+            code: "SE301",
+            title: "Introduction to Software Engineering",
+            instructor: "Dr. Dereje",
+            video: "https://youtube.com",
+            room: "OBU-SE301-Live",
+            fileName: "SE301_Module_1.txt",
+            fileData: "data:text/plain;charset=utf-8," + encodeURIComponent("OBU Software Engineering Module 1\n1. SDLC\n2. System Design")
         },
         {
-            code: "ECEg2141",
-            name: "Signal and System Analysis",
-            instructor: "Mr. Gemechu",
-            live: "https://zoom.us",
-            moduleUrl: "https://w3.org",
-            moduleName: "Signals_Module.pdf"
+            code: "CS304",
+            title: "Web Development & Cloud Computing",
+            instructor: "Mr. Chala",
+            video: "https://youtube.com",
+            room: "OBU-CS304-Live",
+            fileName: "CS304_Module_1.txt",
+            fileData: "data:text/plain;charset=utf-8," + encodeURIComponent("OBU Web & Cloud Module 1\n1. HTML/CSS/JS\n2. Spring Boot & Cloud")
         }
     ];
 
-    var users = JSON.parse(localStorage.getItem("obu_users_v3")) || [
-        { name: "Dereje Bekele", email: "bdereje382@gmail.com", role: "STUDENT" },
-        { name: "System Admin", email: "admin@obu.edu.et", role: "ADMIN" }
-    ];
-
-    function showMessage(text) {
-        var box = document.getElementById('statusMsg');
-        box.innerText = text;
-        box.style.display = 'block';
-        setTimeout(function() { box.style.display = 'none'; }, 4000);
+    function toggleForm() {
+        document.getElementById('loginBox').classList.toggle('hidden');
+        document.getElementById('registerBox').classList.toggle('hidden');
     }
 
-    function formatUrl(url) {
-        if (!url) return "";
-        if (url.indexOf("http://") !== 0 && url.indexOf("https://") !== 0) {
-            return "https://" + url;
-        }
-        return url;
-    }
+    function registerUser() {
+        const name = document.getElementById('regName').value.trim();
+        const email = document.getElementById('regEmail').value.trim().toLowerCase();
+        const department = document.getElementById('regDept').value.trim();
+        const role = document.getElementById('regRole').value;
 
-    function showTab(tabId) {
-        var sections = document.querySelectorAll('.section');
-        for (var i = 0; i < sections.length; i++) {
-            sections[i].classList.remove('active');
-        }
-        var buttons = document.querySelectorAll('.navbar button');
-        for (var i = 0; i < buttons.length; i++) {
-            buttons[i].classList.remove('active');
-        }
-        document.getElementById(tabId).classList.add('active');
-        document.getElementById('btn-' + tabId).classList.add('active');
-        renderData();
-    }
-
-    function loginUser() {
-        var name = document.getElementById('userName').value.trim();
-        var email = document.getElementById('userEmail').value.trim();
-        var role = document.getElementById('userRole').value;
-
-        if (!name || !email) {
-            alert("Please enter both your Full Name and Email!");
+        if (!name || !email || !department) {
+            alert("Please fill in Name, Email, and Department!");
             return;
         }
 
-        users.push({ name: name, email: email, role: role.toUpperCase() });
-        localStorage.setItem("obu_users_v3", JSON.stringify(users));
-        showMessage("Welcome " + name + "! You are logged in as " + role.toUpperCase() + ".");
-        showTab(role);
-    }
-
-    function addCourse() {
-        var code = document.getElementById('courseCode').value.trim();
-        var name = document.getElementById('courseName').value.trim();
-        var instructor = document.getElementById('instructorName').value.trim() || "OBU Instructor";
-        var rawLive = document.getElementById('liveLink').value.trim();
-        var rawModLink = document.getElementById('moduleLink').value.trim();
-        var fileInput = document.getElementById('moduleFile');
-
-        if (!code || !name) {
-            alert("Please enter Course Code and Course Title!");
-            return;
-        }
-
+        let users = JSON.parse(localStorage.getItem("obu_users_db") || "[]");
+        const existingIndex = users.findIndex(function(u) { return u.email === email; });
+        if (existingIndex > -1) {
+            users[existingIndex] = { name: name, email: email, department: department, role: role };
+        } else {
