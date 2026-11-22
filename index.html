@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBU Online Teaching & Learning System</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #f0f4f8; color: #333; }
+        .navbar { background: #003366; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .navbar .brand { font-size: 20px; font-weight: bold; }
+        .navbar button { background: #00509e; color: white; border: none; padding: 9px 16px; margin: 3px; border-radius: 5px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .navbar button:hover, .navbar button.active { background: #28a745; }
+        .container { max-width: 900px; margin: 30px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .section { display: none; }
+        .section.active { display: block; }
+        h2 { color: #003366; border-bottom: 2px solid #003366; padding-bottom: 10px; margin-top: 0; }
+        label { font-weight: bold; display: block; margin-top: 10px; color: #444; }
+        input, select { width: 100%; padding: 10px; margin: 6px 0 12px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
+        .btn-submit { background: #003366; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-submit:hover { background: #002244; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background: #003366; color: white; }
+        tr:nth-child(even) { background: #f9fbfd; }
+        .btn-live { background: #28a745; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: bold; display: inline-block; }
+        .btn-live:hover { background: #218838; }
+        .btn-module { background: #007bff; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: bold; display: inline-block; }
+        .btn-module:hover { background: #0056b3; }
+        .btn-delete { background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+        .alert-success { background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 15px; display: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="brand">🎓 OBU Online Teaching & Learning System</div>
+    <div>
+        <button onclick="showTab('login')" id="btn-login" class="active">1. Login / Register</button>
+        <button onclick="showTab('student')" id="btn-student">2. Student Portal</button>
+        <button onclick="showTab('instructor')" id="btn-instructor">3. Instructor Portal</button>
+        <button onclick="showTab('admin')" id="btn-admin">4. Admin Panel</button>
+    </div>
+</div>
+
+<div class="container">
+    <div id="statusMsg" class="alert-success"></div>
+
+    <!-- 1. LOGIN & REGISTRATION -->
+    <div id="login" class="section active">
+        <h2>User Registration & Login</h2>
+        <label>Full Name</label>
+        <input type="text" id="userName" placeholder="e.g., Dereje Bekele" required>
+        
+        <label>Email Address</label>
+        <input type="email" id="userEmail" placeholder="e.g., bdereje382@gmail.com" required>
+        
+        <label>Select Role</label>
+        <select id="userRole">
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+            <option value="admin">Administrator (Admin)</option>
+        </select>
+        
+        <button class="btn-submit" onclick="loginUser()">Register & Enter System</button>
+    </div>
+
+    <!-- 2. STUDENT DASHBOARD -->
+    <div id="student" class="section">
+        <h2>Student Dashboard — Available Courses & Live Classes</h2>
+        <p>Click <strong>Join Live Class</strong> to attend online sessions or <strong>Download Module</strong> to access study materials.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Course Code</th>
+                    <th>Course Title</th>
+                    <th>Instructor</th>
+                    <th>Live Session</th>
+                    <th>Course Module</th>
+                </tr>
+            </thead>
+            <tbody id="studentCourseList"></tbody>
+        </table>
+    </div>
+
+    <!-- 3. INSTRUCTOR DASHBOARD -->
+    <div id="instructor" class="section">
+        <h2>Instructor Dashboard — Upload Course, Live Link & Module</h2>
+        <label>Course Code</label>
+        <input type="text" id="courseCode" placeholder="e.g., ECEg3101">
+        
+        <label>Course Title</label>
+        <input type="text" id="courseName" placeholder="e.g., Signals and Systems Analysis">
+
+        <label>Instructor Name</label>
+        <input type="text" id="instructorName" placeholder="e.g., Mr. Abebe Kebede">
+        
+        <label>Live Class Link (Google Meet / Zoom URL)</label>
+        <input type="url" id="liveLink" placeholder="e.g., https://google.com">
+        
+        <label>Upload Module File (PDF, PPT, DOCX) OR Paste Module Link below</label>
+        <input type="file" id="moduleFile" accept=".pdf,.doc,.docx,.ppt,.pptx">
+        <input type="url" id="moduleLink" placeholder="Or paste Google Drive / PDF link here (optional)">
+        
+        <button class="btn-submit" onclick="addCourse()">Publish Course & Materials</button>
+    </div>
+
+    <!-- 4. ADMIN DASHBOARD -->
+    <div id="admin" class="section">
+        <h2>Admin Panel — System Management</h2>
+        <h3>Registered Users</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="adminUserList"></tbody>
+        </table>
+
+        <h3 style="margin-top: 30px;">Manage Published Courses</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Course Code</th>
+                    <th>Course Title</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="adminCourseList"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Default sample courses
+    let courses = JSON.parse(localStorage.getItem("obu_courses_en")) || [
+        { 
+            code: "ECEg3101", 
+            name: "Object Oriented Programming", 
+            instructor: "Dr. Tadesse",
+            live: "https://google.com", 
+            moduleUrl: "https://w3.org",
+            moduleName: "OOP_Lecture_Notes.pdf"
+        },
+        { 
+            code: "ECEg2141", 
+            name: "Signal and System Analysis", 
+            instructor: "Mr. Gemechu",
+            live: "https://zoom.us", 
+            moduleUrl: "https://w3.org",
+            moduleName: "Signals_Module.pdf"
+        }
+    ];
+
+    let users = JSON.parse(localStorage.getItem("obu_users_en")) || [
+        { name: "Dereje Bekele", email: "bdereje382@gmail.com", role: "STUDENT" },
+        { name: "System Admin", email: "admin@obu.edu.et", role: "ADMIN" }
+    ];
+
+    function showMessage(text) {
+        let box = document.getElementById('statusMsg');
+        box.innerText = text;
+        box.style.display = 'block';
+        setTimeout(() => { box.style.display = 'none'; }, 4000);
+    }
+
+    function formatUrl(url) {
+        if (!url) return "";
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            return "https://" + url;
+        }
+        return url;
+    }
+
+    function showTab(tabId) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.navbar button').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.getElementById('btn-' + tabId).classList.add('active');
+        renderData();
+    }
+
+    function loginUser() {
+        let name = document.getElementById('userName').value.trim();
+        let email = document.getElementById('userEmail').value.trim();
+        let role = document.getElementById('userRole').value;
+
+        if (!name || !email) { 
+            alert("Please enter both your Full Name and Email!"); 
+            return; 
+        }
+
+        users.push({ name: name, email: email, role: role.toUpperCase() });
+        localStorage.setItem("obu_users_en", JSON.stringify(users));
+        showMessage("Welcome " + name + "! You are logged in as " + role.toUpperCase() + ".");
+        showTab(role);
+    }
+
+    function addCourse() {
+        let code = document.getElementById('courseCode').value.trim();
+        let name = document.getElementById('courseName').value.trim();
+        let instructor = document.getElementById('instructorName').value.trim() || "OBU Instructor";
+        let rawLive = document.getElementById('liveLink').value.trim();
+        let rawModLink = document.getElementById('moduleLink').value.trim();
+        let fileInput = document.getElementById('moduleFile');
+
+        if (!code || !name) { 
+            alert("Please enter Course Code and Course Title!"); 
+            return; 
+        }
+
+        let liveUrl = rawLive ? formatUrl(rawLive) : "https://google.com";
+
+        // Check if a local file was uploaded
+        if (fileInput.files && fileInput.files[0]) {
+            let file = fileInput.files[0];
+            let reader = new FileReader();
